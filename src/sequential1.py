@@ -66,3 +66,41 @@ for x, y in zip(x_test, y_test):
 
 # Score:
 print(f"Accuracy: {true_label * 100/len(x_test)}% on predict true: {true_label} vs true: {len(x_test)}")
+
+# neural network
+network1 = [
+    CNNLayer((1, 28, 28), 3, 5),
+    Sigmoid(),
+    MaxPoolingLayer((5,26,26),2, 2),
+    CNNLayer((5,13,13), 3, 5),
+    Sigmoid(),
+    Reshape((5, 11, 11), (5 * 11 * 11, 1)),
+    FCLayer(5 * 11 * 11, 100),
+    Sigmoid(),
+    FCLayer(100, 3),
+    Softmax()
+]
+start = time.time()
+# train with CNN with rewritten correlate function
+train(
+    network1,
+    binary_cross_entropy,
+    binary_cross_entropy_prime,
+    x_train,
+    y_train,
+    epochs=20,
+    learning_rate=0.1
+)
+end = time.time()
+print(f'Processing time: {end - start} s')
+
+# test with network1
+true_label = 0
+for x, y in zip(x_test, y_test):
+    output = predict(network, x)
+    print(f"pred: {np.argmax(output)}, true: {np.argmax(y)}")
+    if np.argmax(output) == np.argmax(y):
+      true_label += 1
+
+# Score:
+print(f"Accuracy: {true_label * 100/len(x_test)}% on predict true: {true_label} vs true: {len(x_test)}")

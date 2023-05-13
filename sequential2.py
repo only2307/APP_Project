@@ -29,11 +29,11 @@ x_train, y_train = preprocess_data(x_train, y_train, 100)
 x_test, y_test = preprocess_data(x_test, y_test, 100)
 
 # neural network
-network = [
-    Convolutional((1, 28, 28), 3, 5),
+network1 = [
+    CNNLayer((1, 28, 28), 3, 5),
     Sigmoid(),
     MaxPoolingLayer((5,26,26),2, 2),
-    Convolutional((5,13,13), 3, 5),
+    CNNLayer((5,13,13), 3, 5),
     Sigmoid(),
     Reshape((5, 11, 11), (5 * 11 * 11, 1)),
     FCLayer(5 * 11 * 11, 100),
@@ -41,11 +41,10 @@ network = [
     FCLayer(100, 3),
     Softmax()
 ]
-
 start = time.time()
-# train with CNN use scipy -> signal.correlate2D
+# train with CNN with rewritten correlate function
 train(
-    network,
+    network1,
     binary_cross_entropy,
     binary_cross_entropy_prime,
     x_train,
@@ -56,10 +55,10 @@ train(
 end = time.time()
 print(f'Processing time: {end - start} s')
 
-# test with network
+# test with network1
 true_label = 0
 for x, y in zip(x_test, y_test):
-    output = predict(network, x)
+    output = predict(network1, x)
     print(f"pred: {np.argmax(output)}, true: {np.argmax(y)}")
     if np.argmax(output) == np.argmax(y):
       true_label += 1
