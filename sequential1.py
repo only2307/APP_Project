@@ -11,17 +11,28 @@ from fclayer import FCLayer
 from softmax import Softmax
 from network import train, predict
 from loss import *
-# extract 100 img of each class for testing.
 def preprocess_data(x, y, limit): 
+    # Lấy index của các mẫu có nhãn 0, 1, 2 và giới hạn số lượng mẫu cho mỗi nhãn bằng tham số limit
     zero_index = np.where(y == 0)[0][:limit]
     one_index = np.where(y == 1)[0][:limit]
     two_index = np.where(y == 2)[0][:limit]
+    
+    # Ghép các index lại thành một array
     all_indices = np.hstack((zero_index, one_index, two_index))
-    all_indices = np.random.permutation(all_indices)
-    x, y = x[all_indices], y[all_indices]
-    x = x.reshape(len(x), 1, 28, 28)
-    y = np_utils.to_categorical(y)
-    y = y.reshape(len(y), 3, 1)
+    
+    # Xáo trộn thứ tự các index
+    np.random.shuffle(all_indices)
+    
+    # Lấy các mẫu tương ứng với các index đã được xáo trộn
+    x = x[all_indices]
+    y = y[all_indices]
+    
+    # Chuẩn hóa dữ liệu x về dạng 4D tensor với kích thước (samples, channels, rows, cols)
+    x = x.reshape(x.shape[0], 1, x.shape[1], x.shape[2])
+    
+    # One-hot encode nhãn y và chuyển về dạng tensor có kích thước (samples, classes, 1)
+    y = np.eye(3)[y].reshape(y.shape[0], 3, 1)
+    
     return x, y
 
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
